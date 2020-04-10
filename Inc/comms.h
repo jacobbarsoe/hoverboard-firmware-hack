@@ -22,36 +22,7 @@
 #pragma once
 
 #include "stm32f1xx_hal.h"
-#include "config.h"
-#include "defines.h"
 
-void MX_GPIO_Init(void);
-void MX_TIM_Init(void);
-void MX_ADC1_Init(void);
-void MX_ADC2_Init(void);
-void UART2_Init(void);
-void UART3_Init(void);
-
-
-#ifdef CONTROL_PPM
-void PPM_Init();
-void PPM_ISR_Callback();
-void PPM_SysTick_Callback();
-#endif
-
-// Define Beep functions
-void longBeep(uint8_t freq);
-void shortBeep(uint8_t freq);
-
-// Define additional functions. Implementation is in main.c
-void filtLowPass32(int16_t u, uint16_t coef, int32_t *y);
-void mixerFcn(int16_t rtu_speed, int16_t rtu_steer, int16_t *rty_speedR, int16_t *rty_speedL);
-void rateLimiter16(int16_t u, int16_t rate, int16_t *y);
-void multipleTapDet(int16_t u, uint32_t timeNow, MultipleTap *x);
-
-
-void Nunchuck_Init();
-void Nunchuck_Read();
-void consoleScope();
-void consoleLog(char *message);
 void setScopeChannel(uint8_t ch, int16_t val);
+void consoleScope(void);
+void consoleLog(char *message);

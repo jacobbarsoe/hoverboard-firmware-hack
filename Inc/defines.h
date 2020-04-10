@@ -111,7 +111,20 @@
 // #define DCLINK_PULLDOWN 1000
 
 #define LED_PIN GPIO_PIN_2
-#define LED_PORT GPIOB
+#define LED_PORT GPIOD
+
+#define LED2_PIN GPIO_PIN_15
+#define LED2_PORT GPIOA
+
+#define MODE_SEL_SWITCH_1_PIN GPIO_PIN_13
+#define MODE_SEL_SWITCH_1_PORT GPIOC
+
+#define MODE_SEL_SWITCH_2_PIN GPIO_PIN_14
+#define MODE_SEL_SWITCH_2_PORT GPIOC
+
+#define BREAK_SWITCH_PIN GPIO_PIN_15
+#define BREAK_SWITCH_PORT GPIOC
+
 
 #define BUZZER_PIN GPIO_PIN_4
 #define BUZZER_PORT GPIOA
@@ -268,15 +281,23 @@
 #define MAX3(a, b, c) MAX(a, MAX(b, c))
 
 typedef struct {
-  uint16_t rr1;
-  uint16_t rr2;
+  uint16_t dcr; 
+  uint16_t dcl; 
   uint16_t rl1;
   uint16_t rl2;
-  uint16_t dcr;
-  uint16_t dcl;
+  uint16_t rr1;
+  uint16_t rr2;
   uint16_t batt1;
   uint16_t l_tx2;
   uint16_t temp;
   uint16_t l_rx2;
 } adc_buf_t;
+
+
+typedef struct {
+  uint32_t 	t_timePrev;
+  uint8_t 	z_pulseCntPrev;
+  uint8_t 	b_hysteresis;
+  uint8_t 	b_multipleTap;
+} MultipleTap;
 

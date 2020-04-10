@@ -1,15 +1,11 @@
 /*
- * Academic License - for use in teaching, academic research, and meeting
- * course requirements at degree granting institutions only.  Not for
- * government, commercial, or other organizational use.
- *
  * File: rtwtypes.h
  *
  * Code generated for Simulink model 'BLDC_controller'.
  *
- * Model version                  : 1.883
+ * Model version                  : 1.1256
  * Simulink Coder version         : 8.13 (R2017b) 24-Jul-2017
- * C/C++ source code generated on : Tue Jun 11 21:14:57 2019
+ * C/C++ source code generated on : Mon Dec 30 21:36:12 2019
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
