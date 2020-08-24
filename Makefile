@@ -243,6 +243,8 @@ clean:
 
 flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+flash-at32:
+	openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).hex 0 ihex" -c "shutdown"
 
 flash-jlink:
 	 JLink.exe -if swd -device Cortex-M4 -speed 4000 -SettingsFile .\JLinkSettings.ini -CommanderScript jlink-command.jlink

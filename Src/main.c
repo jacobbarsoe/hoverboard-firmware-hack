@@ -267,6 +267,35 @@ int main(void) {
   float board_temp_adc_filtered = (float)adc_buffer.temp;
   float board_temp_deg_c;
 
+  //wait for other RC to startup HW and make a noise when ready
+  //20 samples 5ms * 20 = 100ms of "neutral position"
+  int RCOKcounter = 0;
+  while(RCOKcounter < 20)
+  {
+    int adcstartup1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX);  // ADC1
+    int adcstartup2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX);  // ADC2
+    if(ABS(adcstartup1 - ADC1_MID) < ADC_DEAD_BAND &&
+       ABS(adcstartup2 - ADC2_MID) < ADC_DEAD_BAND)
+    {
+      RCOKcounter++;
+    }
+
+    // ####### POWEROFF BY POWER-BUTTON #######
+    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
+      enable = 0;
+      while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
+      poweroff();
+    }
+    HAL_Delay(DELAY_IN_MAIN_LOOP);
+  }
+  
+  for (int i = 4; i >= 0; i--) {
+    buzzerFreq = i;
+    HAL_Delay(100);
+  }
+  buzzerFreq = 0;
+  //end RC rdy
+
   enable = 1;  // enable motors
 
   while(1) {
@@ -299,9 +328,17 @@ int main(void) {
 
     #ifdef CONTROL_ADC
       // ADC values range: 0-4095, see ADC-calibration in config.h
-      cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX) / (ADC1_MAX / 1000.0f);  // ADC1
-      cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX) / (ADC2_MAX / 1000.0f);  // ADC2
-
+      cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX);  // ADC1
+      cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX);  // ADC2
+	    if(ABS(cmd1 - ADC1_MID) > ADC_DEAD_BAND)
+			  cmd1 = CLAMP((cmd1 - ADC1_MID) * 2, -ADC1_MAX, ADC1_MAX) / (ADC1_MAX / 1000.0f); //  / (ADC2_MAX / 1000.0f
+		  else 
+			  cmd1 = 0;
+	    if(ABS(cmd2 - ADC2_MID) > ADC_DEAD_BAND)
+			  cmd2 = CLAMP((cmd2 - ADC2_MID) * 2, -ADC2_MAX, ADC2_MAX) / (ADC2_MAX / 1000.0f); //  / (ADC2_MAX / 1000.0f
+		  else 
+			  cmd2 = 0;
+	
       // use ADCs as button inputs:
       button1 = (uint8_t)(adc_buffer.l_tx2 > 2000);  // ADC1
       button2 = (uint8_t)(adc_buffer.l_rx2 > 2000);  // ADC2
@@ -420,12 +457,11 @@ int main(void) {
 #else
 
     // ####### MIXER #######
-    speedR = CLAMP(speed * local_speed_coefficent -  steer * local_steer_coefficent, -1000, 1000);
-    speedL = CLAMP(speed * local_speed_coefficent +  steer * local_steer_coefficent, -1000, 1000);
+    speedR = CLAMP(speedR * (1.0 - FILTER) + cmd1 * FILTER,-1000,1000);
+    speedL = CLAMP(speedL * (1.0 - FILTER) + cmd2 * FILTER,-1000,1000);
 
-    #ifdef ADDITIONAL_CODE
-      ADDITIONAL_CODE;
-    #endif
+//    speedR = CLAMP(speed * local_speed_coefficent -  steer * local_steer_coefficent, -1000, 1000);
+//    speedL = CLAMP(speed * local_speed_coefficent +  steer * local_steer_coefficent, -1000, 1000);
 
 
     // ####### SET OUTPUTS #######

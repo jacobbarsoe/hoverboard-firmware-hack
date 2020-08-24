@@ -34,7 +34,7 @@
 
 #define DC_CUR_LIMIT     15         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
 
-// Board overheat detection: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45°C). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20°C warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.
+// Board overheat detetion: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45°C). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20°C warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.
 #define TEMP_CAL_LOW_ADC        1655      // temperature 1: ADC value
 #define TEMP_CAL_LOW_DEG_C      35.8      // temperature 1: measured temperature [°C]
 #define TEMP_CAL_HIGH_ADC       1588      // temperature 2: ADC value
@@ -66,17 +66,20 @@
 
 // ###### CONTROL VIA RC REMOTE ######
 // left sensor board cable. Channel 1: steering, Channel 2: speed.
-#define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
-#define PPM_NUM_CHANNELS 8          // total number of PPM channels to receive, even if they are not used.
+//#define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
+#define PPM_NUM_CHANNELS 3          // total number of PPM channels to receive, even if they are not used.
 #define PPM_DEAD_BAND 5			// dead band around 500
 
 // ###### CONTROL VIA TWO POTENTIOMETERS ######
 // ADC-calibration to cover the full poti-range: connect potis to left sensor board cable (0 to 3.3V) (do NOT use the red 15V wire in the cable!). see <How to calibrate>. turn the potis to minimum position, write value 1 to ADC1_MIN and value 2 to ADC2_MIN. turn to maximum position and repeat it for ADC?_MAX. make, flash and test it.
-//#define CONTROL_ADC                 // use ADC as input. disable CONTROL_SERIAL_USART2!
-// #define ADC1_MIN 0                // min ADC1-value while poti at minimum-position (0 - 4095)
-// #define ADC1_MAX 4095               // max ADC1-value while poti at maximum-position (0 - 4095)
-// #define ADC2_MIN 0                // min ADC2-value while poti at minimum-position (0 - 4095)
-// #define ADC2_MAX 4095               // max ADC2-value while poti at maximum-position (0 - 4095)
+#define CONTROL_ADC                 // use ADC as input. disable CONTROL_SERIAL_USART2!
+#define ADC1_MIN 0                // min ADC1-value while poti at minimum-position (0 - 4095)
+#define ADC1_MAX 4095               // max ADC1-value while poti at maximum-position (0 - 4095)
+#define ADC1_MID 2048
+#define ADC2_MIN 0                // min ADC2-value while poti at minimum-position (0 - 4095)
+#define ADC2_MAX 4095               // max ADC2-value while poti at maximum-position (0 - 4095)
+#define ADC2_MID 2048
+#define ADC_DEAD_BAND 200
 
 // ###### CONTROL VIA NINTENDO NUNCHUCK ######
 // left sensor board cable. keep cable short, use shielded cable, use ferrits, stabalize voltage in nunchuck, use the right one of the 2 types of nunchucks, add i2c pullups. use original nunchuck. most clones does not work very well.
@@ -114,11 +117,11 @@
 // - speedR and speedL: normal driving -1000 to 1000
 // - weakr and weakl: field weakening for extra boost at high speed (speedR > 700 and speedL > 700). 0 to ~400
 
-#define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
+#define FILTER              0.05  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
 #define SPEED_COEFFICIENT   1.0  // higher value == stronger. 0.0 to ~2.0?
 #define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
 //#define INVERT_R_DIRECTION
-#define INVERT_L_DIRECTION
+//#define INVERT_L_DIRECTION
 #define BEEPS_BACKWARD 0    // 0 or 1
 
 //Turbo boost at high speeds while button1 is pressed:
@@ -161,8 +164,7 @@ else {\
   weakl = 0;\
   weakr = 0;
 
-#endif
-
+#endif 
 // ############################### VALIDATE SETTINGS ###############################
 
 #if defined CONTROL_SERIAL_USART2 && defined CONTROL_ADC
